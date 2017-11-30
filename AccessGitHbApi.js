@@ -1,4 +1,3 @@
-
 var Client = require('node-rest-client').Client;
 var client = new Client();
 var request = require('request');
@@ -15,16 +14,26 @@ function callback(error, response, body) {
   console.log(response.statusCode);
   var json = JSON.parse(body);
 
-  json = json.sort(watcherSort);
-  var open_issues=0;
+  json = json.sort(custom_sort);
+  var openIssues = 0;
+  var watchers = 0;
     for(i=0;i<json.length;i++) {
-      console.log(json[i].full_name + " -- " + json[i].watchers_count);
-      open_issues= open_issues +json[i].open_issues;
+    
+      openIssues= openIssues +json[i].open_issues_count;
+      if(watchers <= json[i].watchers_count)
+      {
+        watchers=json[i].watchers_count
+      }
       
     }
-   console.log(open_issues);
-  console.log(json[json.length-1].full_name + " ----MOST WATCHERS");
-
+    console.log("Total Open Issues = " + openIssues );
+    console.log("Maximum watchers = " + watchers );
+    for(i=0;i<json.length;i++) {
+      console.log("Repos "+ json[i].full_name   + " sorted by update date = " + json[i].updated_at );
+    }  
+}
+function custom_sort(a, b) {
+  return new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime();
 }
 
 var watcherSort = function (a, b) {
